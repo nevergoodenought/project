@@ -1,0 +1,14 @@
+.git
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+
+# Keep copyrighted/private dictionaries out of the public Docker image.
+full_dictionary.csv
+kerch_dictionary.csv
+mironov_fb2.csv
+pop_dictionary.csv
+private_data/*.csv
+demo_data/full_dictionary.csv

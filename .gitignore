@@ -1,0 +1,18 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+
+# Private dictionary data. Do not commit copyrighted source files.
+full_dictionary.csv
+kerch_dictionary.csv
+mironov_fb2.csv
+pop_dictionary.csv
+private_data/*.csv
+demo_data/full_dictionary.csv
+
+# Keep public demo CSV files.
+!demo_data/
+!demo_data/demo_*.csv
+!demo_data/README.md

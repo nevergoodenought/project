@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Поиск слов</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .search-container {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        #search-input {
+            flex-grow: 1;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 15px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+        .results {
+            margin-top: 20px;
+        }
+        .word-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+        .word-card h3 {
+            margin-top: 0;
+        }
+        .section {
+            margin-bottom: 10px;
+        }
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Поиск слов в словарях</h1>
+    
+    <div class="search-container">
+        <input type="text" id="search-input" placeholder="Введите слово для поиска...">
+        <button id="search-btn">Поиск</button>
+        <button id="similar-btn">Похожие слова</button>
+    </div>
+    
+    <div id="results" class="results"></div>
+    
+    <script>
+        document.getElementById('search-btn').addEventListener('click', performSearch);
+        document.getElementById('similar-btn').addEventListener('click', findSimilar);
+        document.getElementById('search-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') performSearch();
+        });
+        
+        function performSearch() {
+            const term = document.getElementById('search-input').value.trim();
+            if (!term) return;
+            
+            fetch(`/search?term=${encodeURIComponent(term)}`)
+                .then(response => response.json())
+                .then(data => {
+                    displayResults(data.results || []);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('results').innerHTML = '<p>Ошибка при выполнении поиска</p>';
+                });
+        }
+        
+        function findSimilar() {
+            const term = document.getElementById('search-input').value.trim();
+            if (!term) return;
+            
+            fetch(`/similar?term=${encodeURIComponent(term)}`)
+                .then(response => response.json())
+                .then(data => {
+                    displaySimilarWords(data.similar || []);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('results').innerHTML = '<p>Ошибка при поиске похожих слов</p>';
+                });
+        }
+        
+        function displayResults(results) {
+            const resultsContainer = document.getElementById('results');
+            
+            if (results.length === 0) {
+                resultsContainer.innerHTML = '<p>Ничего не найдено</p>';
+                return;
+            }
+            
+            let html = '';
+            results.forEach(result => {
+                html += '<div class="word-card">';
+                
+                if (result.kerch) {
+                    html += `
+                        <div class="section">
+                            <div class="section-title">Kerch:</div>
+                            <div>RU: ${result.kerch.ru_word || '-'}</div>
+                            <div>RUS: ${result.kerch.rus_word || '-'}</div>
+                        </div>
+                    `;
+                }
+                
+                if (result.pop_rus_ua_ru) {
+                    html += `
+                        <div class="section">
+                            <div class="section-title">Pop Rus-Ua-Ru:</div>
+                            <div>RU: ${result.pop_rus_ua_ru.ru_word || '-'}</div>
+                            <div>RUS: ${result.pop_rus_ua_ru.rus_word || '-'}</div>
+                            <div>UA: ${result.pop_rus_ua_ru.ua_word || '-'}</div>
+                        </div>
+                    `;
+                }
+                
+                if (result.mirinov) {
+                    html += `
+                        <div class="section">
+                            <div class="section-title">Mironov:</div>
+                            <div>RU: ${result.mirinov.ru_word || '-'}</div>
+                            <div>RUS: ${result.mirinov.rus_word || '-'}</div>
+                        </div>
+                    `;
+                }
+                
+                if (result.grammems && (result.grammems.gram || result.grammems.style)) {
+                    html += `
+                        <div class="section">
+                            <div class="section-title">Grammems:</div>
+                            <div>Gram: ${result.grammems.gram || '-'}</div>
+                            <div>Style: ${result.grammems.style || '-'}</div>
+                        </div>
+                    `;
+                }
+                
+                if (result.abrvs) {
+                    html += `
+                        <div class="section">
+                            <div class="section-title">Abbreviations:</div>
+                            <div>${result.abrvs}</div>
+                        </div>
+                    `;
+                }
+                
+                html += '</div>';
+            });
+            
+            resultsContainer.innerHTML = html;
+        }
+        
+        function displaySimilarWords(words) {
+            const resultsContainer = document.getElementById('results');
+            
+            if (words.length === 0) {
+                resultsContainer.innerHTML = '<p>Похожих слов не найдено</p>';
+                return;
+            }
+            
+            let html = '<h2>Похожие слова:</h2><ul>';
+            words.forEach(word => {
+                html += `<li>${word.word} (${word.source})</li>`;
+            });
+            html += '</ul>';
+            
+            resultsContainer.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
