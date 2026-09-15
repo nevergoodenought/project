@@ -40,19 +40,6 @@ docker-compose up --build
 http://127.0.0.1:5003
 ```
 
-PostgreSQL также доступен с компьютера, например через DBeaver:
-
-```text
-Host: localhost
-Port: 5432
-Database: rusindb
-User: postgres
-Password: toor
-```
-
-При первом запуске приложение само соберет `full_dictionary.csv` из демо-файлов
-и загрузит данные в таблицы.
-
 ## Структура данных
 
 После загрузки в базе появляются таблицы:
